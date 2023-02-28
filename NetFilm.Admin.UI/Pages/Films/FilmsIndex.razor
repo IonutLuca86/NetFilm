@@ -1,0 +1,48 @@
+﻿@using NetFilm.Common.Extenstions;
+
+<table class="table mt-2">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Released</th>
+            <th>Lenght</th>           
+            <th>Image URL</th>
+            <th>Video URL</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><img src="@item.ImageURL" class="filmimage" /></td>
+                <td>@item.Title</td>
+                <td>@item.Description.Truncate(30)</td>
+                <td>@item.Released</td>
+                <td>@item.Lenght</td>               
+                <td>@item.VideoURL.Truncate(30)</td>
+
+                <td>
+                    <div class="d-flex me-1 justify-content-end">
+                        <button class="btn btn-outline-primary rounded-1 me-1" @onclick="@(() => OnClick.InvokeAsync(new ClickModel(PageType.AddGenre, item.Id)))">Add Genre</button>
+                        <button class="btn btn-outline-primary rounded-1 me-1" @onclick="@(() => OnClick.InvokeAsync(new ClickModel(PageType.AddSimilar, item.Id)))">Add Similars</button>
+                        <button class="btn btn-outline-primary rounded-1 me-1" @onclick="@(() => OnClick.InvokeAsync(new ClickModel(PageType.Edit, item.Id)))">Edit</button>
+                        <button class="btn btn-outline-danger rounded-1" @onclick="@(() => OnClick.InvokeAsync(new ClickModel(PageType.Delete, item.Id)))">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+    [Parameter] public List<FilmDTO> Model { get; set; } = new();
+    [Parameter] public EventCallback<ClickModel> OnClick { get; set; }
+
+}
+@code {
+
+}

@@ -1,0 +1,74 @@
+﻿@page "/Film/{Id:int}"
+@inject IClientService Service
+
+
+
+<div class="d-flex flex-row justify-content-between  main-container">
+    <section class="d-flex flex-column">
+        <div class="section1 d-flex flex-column  align-items-lg-start">
+
+    <div class="div-back d-flex">
+            <a href="/" class="a-link"><i class="fa-solid fa-left-long"></i></a>
+    </div>
+    <div class="div-info">
+    <h1>@Movie.Title</h1>
+    <div class="d-flex flex-row justify-content-lg-start">
+        @foreach (var genre in Movie.FilmGenres)
+        {
+            <h5 >@genre.Name</h5>
+        }
+        
+    </div>
+    <div class="d-flex flex-row">
+    <h5>@Movie.Released</h5>
+    <h5>@Movie.Lenght</h5>
+    </div>
+    <h4>Directed by : @Director.Name</h4>
+    <h6 >@Movie.Description</h6>
+    </div>
+            <div class="d-flex flex-row justify-content-lg-start">
+            <a href="PlayFilm/@Movie.Id" class="a-link  ">
+                <div>
+                    <i class="fa-solid fa-play" style="margin-right: 1rem"></i>
+                </div>
+               <span>Play</span>
+           </a>
+    </div>        
+</div>
+<div class="d-flex flex-column align-content-lg-start" style="width:80rem;">
+            <h2 style="margin: 15px auto 20px 40px;">Similar Films</h2>
+            <div class="d-flex flex-row flex-wrap  justify-content-lg-start" style="height: 20rem; width: 90%;margin-left: 4rem;">
+
+                @foreach (var similar in Similars)
+                {
+                    <div class="similar card me-1 mb-3 rounded-2" style=" width: 16rem; height: 10rem; background-color: #000;">
+                        <a href="Film/@similar.Id"><img src="@similar.ImageURL" alt="@similar.Title" class="card-img-overlay" style="width: 100%; height:100%;"></a>
+                    </div>
+                }
+            </div>
+</div>
+</section>
+
+<aside >
+    <img src="@Movie.ImageURL" alt="film poster" class="poster"/>
+</aside>
+</div>
+
+@code {
+    [Parameter] public FilmDTO Movie { get; set; } = new();
+    [Parameter] public int Id { get; set; }
+    [Parameter] public DirectorDTO Director { get; set; } = new();
+    [Parameter] public List<FilmDTO> Similars { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Movie = await Service.SingleAsync<FilmDTO>("Film", Id);
+        Director = await Service.SingleAsync<DirectorDTO>("Director", Movie.DirectorId);
+        Similars.Clear();
+        foreach(var film in Movie.SimilarFilms)
+        {
+            Similars.Add(await Service.SingleAsync<FilmDTO>("Film", film.SimilarFilmId));
+        }
+    }
+
+  }

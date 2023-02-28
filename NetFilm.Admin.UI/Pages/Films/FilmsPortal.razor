@@ -1,0 +1,76 @@
+﻿
+@inject IAdminService AdminService
+
+
+@if (!string.IsNullOrEmpty(Alert))
+{
+    <div class="d-flex">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>@Alert</strong>
+            <button type="button" @onclick="CloseAlert" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+<h3>@Navigation</h3>
+@if (Navigation == PageType.Create)
+{
+<ChangeFilms Page="@Navigation" OnChange="OnChange"></ChangeFilms>
+}
+@if (Navigation == PageType.Delete || Navigation == PageType.Edit || Navigation == PageType.AddGenre || Navigation == PageType.AddSimilar)
+{
+    <ChangeFilms Page="@Navigation" OnChange="OnChange" Model="Film"></ChangeFilms>
+}
+
+<div class="d-flex me-1">
+    <a href="/" class="btn btn-outline-secondary rounded-1 me-1">Home</a>
+    <button type="button" class="btn btn-outline-primary rounded-1 me-1" @onclick="()=>ChangePageType(PageType.Index)">Index</button>
+    <button type="button" class="btn btn-outline-success rounded-1" @onclick="()=>ChangePageType(PageType.Create)">Create</button>
+</div>
+
+
+<FilmsIndex Model="Model" OnClick="OnClick"></FilmsIndex>
+
+@code {
+    public List<FilmDTO> Model { get; set; } = new();
+    [Parameter] public string Alert { get; set; } = string.Empty;
+    [Parameter] public string Navigation { get; set; } = string.Empty;
+    FilmDTO? Film { get; set; }
+  
+
+
+
+    void ChangePageType(string pageType) => Navigation = pageType;
+    void CloseAlert() => Alert = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Alert = string.Empty;
+        Model = await AdminService.GetAsync<FilmDTO>($"film");
+    }
+    public async Task OnClick(ClickModel model)
+    {
+
+        if (model.PageType.Equals(PageType.Edit) || model.PageType.Equals(PageType.Delete) || model.PageType.Equals(PageType.AddGenre) || model.PageType.Equals(PageType.AddSimilar))
+            Film = await AdminService.SingleAsync<FilmDTO>($"film/{model.id}") ?? new();
+                    
+        ChangePageType(model.PageType);
+
+
+    }
+    public async Task OnChange(string alert)
+    {
+        try
+        {
+            Alert = alert;
+            Model = await AdminService.GetAsync<FilmDTO>("Film");
+            ChangePageType(PageType.Index);
+        }
+        catch
+        {
+            Alert = "Couldn't create/edit/delete the entry!";
+        }
+    }
+
+
+}
+

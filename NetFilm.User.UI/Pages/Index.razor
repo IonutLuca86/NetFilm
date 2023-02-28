@@ -1,0 +1,116 @@
+﻿@page "/"
+
+@inject IClientService Service
+
+<PageTitle>Netfilm</PageTitle>
+<header>
+<nav class="d-flex flex-wrap flex-row justify-content-between">
+    <div class="d-flex justify-content-between align-content-center">
+    <a href="/" class="mr afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-house"></i>
+        </div>
+        <span>Home</span>
+    </a>
+    <a href="/Movies" class="afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-clapperboard"></i>
+        </div>
+        <span>Movies</span>
+    </a>
+    
+    </div>  
+    
+    <img class="logo" src="images/logo-no-background.png" alt="logo" />
+    
+    <div>
+        <form class="example" action="action_page.php">
+            <input type="text" placeholder="Search.." name="search">
+            <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+    </div>
+</nav>
+</header>
+<section class="d-flex flex-wrap">
+<h2 style="margin: 50px auto 20px 40px;">Todays Recommended Movies</h2>
+<div class="d-flex flex-wrap  justify-content-center" style="height: 18rem; width: 90%;margin-left: 4rem;">
+    
+    @foreach (var film in Recommended)
+    {
+        <div class="movie-card card me-1 mb-3 rounded-2" style=" width: 16rem; background-color: #000;">
+            <a href="/Film/@film.Id"><img src="@film.ImageURL" alt="@film.Title" class="card-img-overlay" style="width: 100%; height:100%;" ></a>  
+        </div>
+    }
+</div>
+</section>
+<section class="d-flex flex-wrap">
+<h2 style="margin: 50px auto 20px 40px;">Top Rated Movies</h2>
+<div class="d-flex flex-wrap  justify-content-center" style="height: 18rem; width: 90%;margin-left: 4rem;">
+    
+    @foreach (var film in TopRated)
+    {
+        <div class="movie-card card me-1 mb-3 rounded-2" style=" width: 16rem; background-color: #000;">
+            <a href="/Film/@film.Id"><img src="@film.ImageURL" alt="@film.Title" class="card-img-overlay" style="width: 100%; height:100%;" ></a>  
+        </div>
+    }
+</div>
+</section>
+<footer class="d-flex flex-row justify-content-center align-content-center">
+    <a href="/" class="mr afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-address-card"></i>
+        </div>
+        <span>About</span>
+        </a>
+    <a href="/" class="mr afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-building-shield"></i>
+        </div>
+        <span>Terms & Policies</span>
+    </a>
+    <a href="/" class="mr afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-address-book"></i>
+        </div>
+        <span>Contact</span>
+    </a>
+
+</footer>
+
+@code{
+    [Parameter] public List<FilmDTO> Films { get; set; } = new();
+    [Parameter] public List<FilmDTO> Recommended { get; set; } = new();
+    [Parameter] public List<FilmDTO> TopRated { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        Films = await Service.GetAsync<FilmDTO>("Film");
+        var random = new Random();
+        int counter = 1;
+        do
+        {
+            int rnd1 = random.Next(Films.Count);
+            if(!Recommended.Contains(Films[rnd1]))
+            {
+                Recommended.Add(Films[rnd1]);
+                counter++;
+            }
+
+
+        } while (counter <= 5);
+        int counter2 = 1;
+        do
+        {
+            int rnd2 = random.Next(Films.Count);
+            if (!TopRated.Contains(Films[rnd2]))
+            {
+                TopRated.Add(Films[rnd2]);
+                counter2++;
+            }
+
+
+        } while (counter2 <= 5);
+    }
+
+}
+
+

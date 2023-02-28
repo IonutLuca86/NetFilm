@@ -1,0 +1,73 @@
+﻿@page "/Movies"
+@inject IClientService Service
+
+<header>
+<nav class="d-flex flex-wrap flex-row justify-content-between">
+    <div class="d-flex justify-content-between align-content-center">
+    <a href="/" class="mr afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-house"></i>
+        </div>
+        <span>Home</span>
+    </a>
+    <a href="/" class="afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-clapperboard"></i>
+        </div>
+        <span>Movies</span>
+    </a>
+
+    </div>  
+
+    <img class="logo" src="images/logo-no-background.png" alt="logo" />
+
+    <div>
+        <form class="example" action="action_page.php">
+            <input type="text" placeholder="Search.." name="search">
+            <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+    </div>
+</nav>
+</header>
+<section class="d-flex flex-wrap" style="height:80rem; width:auto;">
+<div class="d-flex flex-wrap justify-content-center">
+
+        @foreach (var film in Films)
+        {
+            <div class="movie-card card me-1 mb-3 rounded-2" style=" width: 15rem; background-color: #000;">
+                <a href="/Film/@film.Id"><img src="@film.ImageURL" alt="@film.Title" class="card-img-overlay" style="width: 100%; height:100%;" ></a>  
+            </div>
+        }
+</div>
+</section>
+
+<footer class="d-flex flex-row justify-content-center align-content-center">
+    <a href="/" class="mr afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-address-card"></i>
+        </div>
+        <span>About</span>
+        </a>
+    <a href="/" class="mr afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-building-shield"></i>
+        </div>
+        <span>Terms & Policies</span>
+    </a>
+    <a href="/" class="mr afont d-flex flex-column align-items-center">
+        <div>
+            <i class="fa-solid fa-address-book"></i>
+        </div>
+        <span>Contact</span>
+    </a>
+
+</footer>
+
+@code {
+    [Parameter] public List<FilmDTO> Films { get; set; } = new();
+
+     protected override async Task OnInitializedAsync()
+    {
+        Films = await Service.GetAsync<FilmDTO>("Film");
+    }
+}
